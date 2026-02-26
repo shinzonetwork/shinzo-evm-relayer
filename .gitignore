@@ -1,0 +1,29 @@
+# Build artifacts
+/build/
+/dist/
+/out/
+
+# Go
+*.test
+*.coverprofile
+coverage.*
+vendor/
+
+# Editor/OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Logs & env
+*.log
+.env
+.env.*
+!.env.example
+
+# Local data / keys
+mnemonic.txt
+data.txt
+
+# Node leftovers (if any scripts pull deps)
+node_modules/
