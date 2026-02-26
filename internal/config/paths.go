@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 )
 
-// Paths holds well-known filesystem locations for the relayer.
 type Paths struct {
 	HomeDir    string
 	ConfigDir  string
@@ -15,7 +14,6 @@ type Paths struct {
 	ConfigFile string
 }
 
-// Resolve returns paths rooted at ~/.shinzo-evm-relayer.
 func Resolve() (Paths, error) {
 	home, err := os.UserHomeDir()
 	if err != nil {
@@ -31,7 +29,6 @@ func Resolve() (Paths, error) {
 	}, nil
 }
 
-// EnsureDirs creates all required directories if they do not exist.
 func EnsureDirs(paths Paths) error {
 	for _, d := range []string{paths.HomeDir, paths.ConfigDir, paths.DataDir, paths.LogsDir} {
 		if err := os.MkdirAll(d, 0o755); err != nil {

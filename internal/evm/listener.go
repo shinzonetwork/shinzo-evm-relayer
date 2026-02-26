@@ -13,7 +13,6 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
-// PaymentData holds the decoded fields of a PaymentCreated event.
 type PaymentData struct {
 	Resource   uint8
 	Identity   string
@@ -21,14 +20,12 @@ type PaymentData struct {
 	Expiration *big.Int
 }
 
-// PaymentEvent is a parsed PaymentCreated log emitted by the Outpost contract.
 type PaymentEvent struct {
 	TxHash   string
 	BlockNum uint64
 	Payload  PaymentData
 }
 
-// ListenerConfig holds parameters for the payment event listener.
 type ListenerConfig struct {
 	RPC          string
 	ContractAddr string
@@ -36,19 +33,14 @@ type ListenerConfig struct {
 	Logger       *log.Logger
 }
 
-// Listener subscribes to PaymentCreated events from the Outpost contract and
-// writes them to an output channel.
 type Listener struct {
 	cfg ListenerConfig
 }
 
-// NewListener creates a new Listener.
 func NewListener(cfg ListenerConfig) *Listener {
 	return &Listener{cfg: cfg}
 }
 
-// Run connects to the EVM node, subscribes to PaymentCreated logs, and writes
-// events to out. It blocks until the subscription fails.
 func (l *Listener) Run(out chan<- PaymentEvent) error {
 	if l.cfg.ContractAddr == "" {
 		return fmt.Errorf("evm.contract is required when payment_listen_enabled=true")

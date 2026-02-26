@@ -13,7 +13,6 @@ import (
 	"github.com/shinzonetwork/shinzo-evm-relayer/internal/keys"
 )
 
-// privKeySigner wraps a Cosmos private key and satisfies shinzosdk.TxSigner.
 type privKeySigner struct{ key cryptotypes.PrivKey }
 
 func (s *privKeySigner) GetPrivateKey() cryptotypes.PrivKey { return s.key }
@@ -21,8 +20,6 @@ func (s *privKeySigner) GetAccAddress() string {
 	return sdk.AccAddress(s.key.PubKey().Address().Bytes()).String()
 }
 
-// buildSigner loads the relayer key from disk and returns a TxSigner together
-// with the relayer's shinzo bech32 address.
 func buildSigner(configDir string) (shinzosdk.TxSigner, string, error) {
 	rec, err := keys.Load(configDir)
 	if err != nil {

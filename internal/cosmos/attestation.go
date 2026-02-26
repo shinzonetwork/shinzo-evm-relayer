@@ -15,7 +15,6 @@ import (
 	"github.com/shinzonetwork/shinzo-evm-relayer/internal/keys"
 )
 
-// AttestationSenderConfig holds parameters for the attestation pipeline Cosmos sender.
 type AttestationSenderConfig struct {
 	GRPCAddr      string
 	RPCAddr       string
@@ -27,19 +26,14 @@ type AttestationSenderConfig struct {
 	Logger        *log.Logger
 }
 
-// AttestationSender reads AttestationJobs from an EVM scanner and broadcasts
-// the corresponding MsgIndexerAttestation messages to shinzohub.
 type AttestationSender struct {
 	cfg AttestationSenderConfig
 }
 
-// NewAttestationSender creates a new AttestationSender.
 func NewAttestationSender(cfg AttestationSenderConfig) *AttestationSender {
 	return &AttestationSender{cfg: cfg}
 }
 
-// Run connects to shinzohub and processes incoming attestation jobs until the
-// channel is closed or an unrecoverable error occurs.
 func (s *AttestationSender) Run(in <-chan evm.AttestationJob) error {
 	signer, bech32Addr, err := buildSigner(s.cfg.ConfigDir)
 	if err != nil {

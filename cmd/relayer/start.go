@@ -68,7 +68,6 @@ func newStartCmd() *cobra.Command {
 	return cmd
 }
 
-// bindFlag registers a typed flag and binds it to viper with env-var support.
 func bindFlag(cmd *cobra.Command, name string, def interface{}) {
 	switch v := def.(type) {
 	case string:
@@ -85,8 +84,6 @@ func bindFlag(cmd *cobra.Command, name string, def interface{}) {
 	viper.AutomaticEnv()
 }
 
-// applyOverrides copies any non-zero flag/env values onto cfg, leaving the
-// file-based defaults intact when flags were not explicitly set.
 func applyOverrides(cmd *cobra.Command, cfg *config.Config) {
 	if v := viper.GetString("evm.rpc"); v != "" {
 		cfg.EVM.RPC = v

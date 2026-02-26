@@ -6,14 +6,10 @@ import (
 	"path/filepath"
 )
 
-// Cursor tracks the next block to scan. It is persisted as JSON so progress
-// survives restarts.
 type Cursor struct {
 	NextBlock uint64 `json:"next_block"`
 }
 
-// Load reads the cursor from dataDir/scan_cursor.json. When the file does not
-// exist, or the stored value is zero, defaultStart is used.
 func Load(dataDir string, defaultStart uint64) (Cursor, error) {
 	p := filepath.Join(dataDir, "scan_cursor.json")
 	bz, err := os.ReadFile(p)
@@ -33,7 +29,6 @@ func Load(dataDir string, defaultStart uint64) (Cursor, error) {
 	return c, nil
 }
 
-// Save writes the cursor to dataDir/scan_cursor.json.
 func Save(dataDir string, c Cursor) error {
 	p := filepath.Join(dataDir, "scan_cursor.json")
 	bz, _ := json.MarshalIndent(c, "", "  ")

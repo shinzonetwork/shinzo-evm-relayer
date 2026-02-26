@@ -12,14 +12,12 @@ import (
 	"github.com/shinzonetwork/shinzo-evm-relayer/internal/keys"
 )
 
-// App is the top-level application object that owns the relayer pipelines.
 type App struct {
 	Config config.Config
 	Paths  config.Paths
 	Logger *log.Logger
 }
 
-// NewLogger creates a charmbracelet logger configured for the given level.
 func NewLogger(level string) *log.Logger {
 	return log.NewWithOptions(os.Stdout, log.Options{
 		ReportTimestamp: true,
@@ -39,8 +37,6 @@ func parseLevel(level string) log.Level {
 	}
 }
 
-// Start runs the configured pipelines and blocks until one of them returns an
-// error (or the process is killed).
 func (a *App) Start() error {
 	a.Logger.Info("Relayer setup done, starting processes")
 	keys.SetBech32HRP("shinzo")

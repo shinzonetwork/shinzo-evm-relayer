@@ -16,8 +16,6 @@ import (
 	"github.com/shinzonetwork/shinzo-evm-relayer/internal/cursor"
 )
 
-// AttestationJob carries a fully validated attestation ready to be relayed to
-// shinzohub.
 type AttestationJob struct {
 	SourceBlock string
 	BlockHash   string
@@ -27,7 +25,7 @@ type AttestationJob struct {
 
 	AttestationID     *big.Int
 	Withdrawal        common.Address
-	DelegateKey       [32]byte
+	DelegateKey       common.Address
 	ConsensusPubKey   []byte
 	CreatedAt         uint64
 	SignatureDeadline uint64
@@ -42,11 +40,10 @@ type AttestationJob struct {
 	PointerLocal  [15]byte
 }
 
-// ScannerConfig holds parameters for the extraData scanner.
 type ScannerConfig struct {
 	RPC           string
 	IssuerAddr    string
-	ExtraDataTag  string // 2-byte hex, e.g. "0x5348"
+	ExtraDataTag  string
 	BatchSize     uint64
 	Confirmations uint64
 	StartBlock    uint64
@@ -54,20 +51,14 @@ type ScannerConfig struct {
 	Logger        *log.Logger
 }
 
-// Scanner polls EVM block headers for the configured extraData tag, resolves
-// the embedded pointer to an attestation, verifies signatures, and writes
-// validated jobs to an output channel.
 type Scanner struct {
 	cfg ScannerConfig
 }
 
-// NewScanner creates a new Scanner.
 func NewScanner(cfg ScannerConfig) *Scanner {
 	return &Scanner{cfg: cfg}
 }
 
-// Run starts the polling loop. It blocks indefinitely, writing AttestationJobs
-// to out whenever a valid, fully-signed attestation is found.
 func (s *Scanner) Run(out chan<- AttestationJob) error {
 	if s.cfg.IssuerAddr == "" {
 		return fmt.Errorf("evm.issuer is required for extraData scanning")
@@ -238,10 +229,6 @@ func (s *Scanner) Run(out chan<- AttestationJob) error {
 	}
 }
 
-// ── helpers ────────────────────────────────────────────────────────────────────
-
-// decodePointer decodes the 15-byte pointer embedded as 30 ASCII hex chars in
-// extra[2:32].
 func decodePointer(extra []byte) ([15]byte, error) {
 	var out [15]byte
 	if len(extra) != 32 {

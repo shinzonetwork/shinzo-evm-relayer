@@ -14,7 +14,6 @@ import (
 	"github.com/shinzonetwork/shinzo-evm-relayer/internal/evm"
 )
 
-// PaymentSenderConfig holds parameters for the payment pipeline Cosmos sender.
 type PaymentSenderConfig struct {
 	GRPCAddr  string
 	RPCAddr   string
@@ -24,19 +23,14 @@ type PaymentSenderConfig struct {
 	Logger    *log.Logger
 }
 
-// PaymentSender reads PaymentEvents from an EVM listener and broadcasts the
-// corresponding RequestStreamAccess messages to shinzohub.
 type PaymentSender struct {
 	cfg PaymentSenderConfig
 }
 
-// NewPaymentSender creates a new PaymentSender.
 func NewPaymentSender(cfg PaymentSenderConfig) *PaymentSender {
 	return &PaymentSender{cfg: cfg}
 }
 
-// Run connects to shinzohub and processes incoming payment events until the
-// channel is closed or an unrecoverable error occurs.
 func (s *PaymentSender) Run(in <-chan evm.PaymentEvent) error {
 	signer, bech32Addr, err := buildSigner(s.cfg.ConfigDir)
 	if err != nil {

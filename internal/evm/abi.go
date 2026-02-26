@@ -1,7 +1,5 @@
 package evm
 
-// outpostABI is the minimal ABI for the Outpost contract — only the
-// PaymentCreated event is needed by the listener.
 const outpostABI = `[
   {
     "anonymous": false,
@@ -16,8 +14,6 @@ const outpostABI = `[
   }
 ]`
 
-// issuerABI is the minimal ABI for ShinzoChallengeIssuerV1 — only the
-// view functions used by the scanner are included.
 const issuerABI = `[
   {
     "inputs": [{"internalType": "bytes", "name": "headerExtra", "type": "bytes"}],
@@ -31,7 +27,7 @@ const issuerABI = `[
     "name": "attestationCore",
     "outputs": [
       {"internalType": "address",  "name": "withdrawalAddress",  "type": "address"},
-      {"internalType": "bytes32",  "name": "delegateKey",        "type": "bytes32"},
+      {"internalType": "address",  "name": "delegateKey",        "type": "address"},
       {"internalType": "bytes",    "name": "consensusPubKey",    "type": "bytes"},
       {"internalType": "uint64",   "name": "createdAt",          "type": "uint64"},
       {"internalType": "uint64",   "name": "signatureDeadline",  "type": "uint64"},

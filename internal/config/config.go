@@ -7,17 +7,15 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
-// Config holds all relayer configuration.
 type Config struct {
 	EVM    EVMConfig    `toml:"evm"`
 	Cosmos CosmosConfig `toml:"cosmos"`
 	Log    LogConfig    `toml:"log"`
 }
 
-// EVMConfig is the [evm] section.
 type EVMConfig struct {
 	RPC        string `toml:"rpc"`
-	Contract   string `toml:"contract"` // Outpost contract address (PaymentCreated events)
+	Contract   string `toml:"contract"`
 	StartBlock uint64 `toml:"start_block"`
 
 	PaymentListenEnabled bool `toml:"payment_listen_enabled"`
@@ -25,13 +23,12 @@ type EVMConfig struct {
 	ScanEnabled   bool   `toml:"scan_enabled"`
 	ScanBatchSize uint64 `toml:"scan_batch_size"`
 	Confirmations uint64 `toml:"confirmations"`
-	Issuer        string `toml:"issuer"`       // ShinzoChallengeIssuerV1 address
-	ExtraDataTag  string `toml:"extradata_tag"` // 2-byte hex tag, e.g. "0x5348" ("SH")
-	SourceChain   string `toml:"source_chain"`  // human name sent to shinzohub, e.g. "ethereum"
+	Issuer        string `toml:"issuer"`
+	ExtraDataTag  string `toml:"extradata_tag"`
+	SourceChain   string `toml:"source_chain"`
 	SourceChainID uint64 `toml:"source_chain_id"`
 }
 
-// CosmosConfig is the [cosmos] section.
 type CosmosConfig struct {
 	GRPC      string `toml:"grpc"`
 	RPC       string `toml:"rpc"`
@@ -40,7 +37,6 @@ type CosmosConfig struct {
 	GasPrices string `toml:"gas_prices"`
 }
 
-// LogConfig is the [log] section.
 type LogConfig struct {
 	Level string `toml:"level"`
 }
@@ -77,8 +73,6 @@ gas_prices = "0.025ushinzo"
 level = "info"
 `
 
-// Ensure writes the default config if none exists. Returns true when a new
-// file was created.
 func Ensure(paths Paths) (bool, error) {
 	if _, err := os.Stat(paths.ConfigFile); os.IsNotExist(err) {
 		if err := os.WriteFile(paths.ConfigFile, []byte(defaultConfig), 0o644); err != nil {
@@ -89,7 +83,6 @@ func Ensure(paths Paths) (bool, error) {
 	return false, nil
 }
 
-// Load parses the TOML config file at paths.ConfigFile.
 func Load(paths Paths) (Config, error) {
 	var cfg Config
 	if _, err := toml.DecodeFile(paths.ConfigFile, &cfg); err != nil {

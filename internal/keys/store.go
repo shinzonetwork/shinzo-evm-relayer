@@ -7,14 +7,12 @@ import (
 	"path/filepath"
 )
 
-// Record is the persisted key material stored in key.json.
 type Record struct {
 	Name     string `json:"name"`
 	Mnemonic string `json:"mnemonic"`
 	HdPath   string `json:"hd_path"`
 }
 
-// Load reads the key record from configDir/key.json.
 func Load(configDir string) (Record, error) {
 	path := filepath.Join(configDir, "key.json")
 	bz, err := os.ReadFile(path)
@@ -28,7 +26,6 @@ func Load(configDir string) (Record, error) {
 	return rec, nil
 }
 
-// Save writes the key record to configDir/key.json with restricted permissions.
 func Save(configDir string, rec Record) error {
 	path := filepath.Join(configDir, "key.json")
 	bz, err := json.MarshalIndent(rec, "", "  ")

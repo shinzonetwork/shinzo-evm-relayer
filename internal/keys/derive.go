@@ -11,8 +11,6 @@ import (
 	hdwallet "github.com/miguelmota/go-ethereum-hdwallet"
 )
 
-// DerivePrivAndEVMAddr derives an ECDSA private key and EVM address from a
-// BIP-39 mnemonic using the given HD derivation path.
 func DerivePrivAndEVMAddr(mnemonic, hdPath string) (*ecdsa.PrivateKey, common.Address, error) {
 	wallet, err := hdwallet.NewFromMnemonic(mnemonic)
 	if err != nil {
@@ -33,8 +31,6 @@ func DerivePrivAndEVMAddr(mnemonic, hdPath string) (*ecdsa.PrivateKey, common.Ad
 	return priv, gethcrypto.PubkeyToAddress(priv.PublicKey), nil
 }
 
-// PreviewAddresses returns the EVM hex address and Shinzo bech32 address
-// for the given mnemonic, without requiring a running chain.
 func PreviewAddresses(mnemonic, hdPath string) (evmAddr, shinzoAddr string, err error) {
 	_, addr, err := DerivePrivAndEVMAddr(mnemonic, hdPath)
 	if err != nil {
@@ -44,7 +40,6 @@ func PreviewAddresses(mnemonic, hdPath string) (evmAddr, shinzoAddr string, err 
 	return addr.Hex(), s, err
 }
 
-// EVMToBech32 encodes an EVM address as a Bech32 string with the given HRP.
 func EVMToBech32(hrp string, addr common.Address) (string, error) {
 	data5, err := convertBits(addr.Bytes(), 8, 5, true)
 	if err != nil {
@@ -53,8 +48,6 @@ func EVMToBech32(hrp string, addr common.Address) (string, error) {
 	return bech32.Encode(hrp, data5)
 }
 
-// SetBech32HRP configures the Cosmos SDK bech32 prefix. Must be called once
-// at startup, before any SDK address operations.
 func SetBech32HRP(hrp string) {
 	cfg := sdk.GetConfig()
 	cfg.SetBech32PrefixForAccount(hrp, hrp+sdk.PrefixPublic)

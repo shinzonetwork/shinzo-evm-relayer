@@ -14,10 +14,9 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 )
 
-// AttestationCore holds the on-chain state for a single attestation.
 type AttestationCore struct {
 	Withdrawal        common.Address
-	DelegateKey       [32]byte
+	DelegateKey       common.Address
 	ConsensusPubKey   []byte
 	CreatedAt         uint64
 	SignatureDeadline uint64
@@ -28,7 +27,6 @@ type AttestationCore struct {
 	DelegateSig       []byte
 }
 
-// DomainSeparator calls DOMAIN_SEPARATOR() on the issuer contract.
 func DomainSeparator(ctx context.Context, client *ethclient.Client, parsed abi.ABI, issuer common.Address) ([32]byte, error) {
 	var zero [32]byte
 	data, err := parsed.Pack("DOMAIN_SEPARATOR")
@@ -52,8 +50,6 @@ func DomainSeparator(ctx context.Context, client *ethclient.Client, parsed abi.A
 	return out[0].([32]byte), nil
 }
 
-// ResolveFromExtraData calls resolveFromExtraData() on the issuer and returns
-// the attestation ID. Returns an error when the pointer is unknown (result = 0).
 func ResolveFromExtraData(ctx context.Context, client *ethclient.Client, parsed abi.ABI, issuer common.Address, extra []byte) (*big.Int, error) {
 	data, err := parsed.Pack("resolveFromExtraData", extra)
 	if err != nil {
@@ -83,7 +79,6 @@ func ResolveFromExtraData(ctx context.Context, client *ethclient.Client, parsed 
 	return attID, nil
 }
 
-// FetchAttestationCore calls attestationCore() on the issuer.
 func FetchAttestationCore(ctx context.Context, client *ethclient.Client, parsed abi.ABI, issuer common.Address, attID *big.Int) (AttestationCore, error) {
 	var a AttestationCore
 	data, err := parsed.Pack("attestationCore", attID)
@@ -106,7 +101,7 @@ func FetchAttestationCore(ctx context.Context, client *ethclient.Client, parsed 
 	}
 
 	a.Withdrawal = out[0].(common.Address)
-	a.DelegateKey = out[1].([32]byte)
+	a.DelegateKey = out[1].(common.Address)
 	a.ConsensusPubKey = out[2].([]byte)
 	a.CreatedAt = out[3].(uint64)
 	a.SignatureDeadline = out[4].(uint64)
@@ -122,26 +117,21 @@ func FetchAttestationCore(ctx context.Context, client *ethclient.Client, parsed 
 	return a, nil
 }
 
-// ParseIssuerABI parses and returns the issuer ABI.
 func ParseIssuerABI() (abi.ABI, error) {
 	return abi.JSON(strings.NewReader(issuerABI))
 }
 
-// ParseOutpostABI parses and returns the outpost ABI.
 func ParseOutpostABI() (abi.ABI, error) {
 	return abi.JSON(strings.NewReader(outpostABI))
 }
 
-// attestationTypeString is the EIP-712 type string for AttestationChallenge.
-const attestationTypeString = "AttestationChallenge(uint256 attestationId,address withdrawalAddress,bytes32 delegateKey,bytes32 consensusKeyHash,uint64 createdAt,uint64 signatureDeadline)"
+const attestationTypeString = "AttestationChallenge(uint256 attestationId,address withdrawalAddress,address delegateKey,bytes32 consensusKeyHash,uint64 createdAt,uint64 signatureDeadline)"
 
-// ComputeDigest computes the EIP-712 digest for an attestation locally,
-// mirroring the on-chain attestationDigest() logic.
 func ComputeDigest(
 	domainSep [32]byte,
 	attID *big.Int,
 	withdrawal common.Address,
-	delegateKey [32]byte,
+	delegateKey common.Address,
 	consensusPubKey []byte,
 	createdAt uint64,
 	deadline uint64,
@@ -160,7 +150,7 @@ func ComputeDigest(
 		{Type: bytes32Ty},
 		{Type: uint256Ty},
 		{Type: addressTy},
-		{Type: bytes32Ty},
+		{Type: addressTy},
 		{Type: bytes32Ty},
 		{Type: uint64Ty},
 		{Type: uint64Ty},
@@ -179,8 +169,6 @@ func ComputeDigest(
 	return digest, nil
 }
 
-// VerifySignatureEither verifies that sig65 was produced by expected over
-// digest, accepting both raw secp256k1 and EIP-191 personal signatures.
 func VerifySignatureEither(digest [32]byte, expected common.Address, sig65 []byte) bool {
 	if len(sig65) != 65 {
 		return false
@@ -191,14 +179,12 @@ func VerifySignatureEither(digest [32]byte, expected common.Address, sig65 []byt
 		sig[64] -= 27
 	}
 
-	// Raw digest.
 	if pub, err := gethcrypto.SigToPub(digest[:], sig); err == nil {
 		if gethcrypto.PubkeyToAddress(*pub) == expected {
 			return true
 		}
 	}
 
-	// EIP-191 personal_sign prefix.
 	personal := gethcrypto.Keccak256(
 		[]byte("\x19Ethereum Signed Message:\n32"),
 		digest[:],
